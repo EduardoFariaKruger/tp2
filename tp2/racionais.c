@@ -13,8 +13,6 @@
  * implementadas neste arquivo.
 */
 
-int *ponteiro;
-
 /* retorna um numero aleatorio entre min e max, inclusive. */
 int aleat (int min, int max){
     return (min + rand() % (max - min + 1));
@@ -60,16 +58,16 @@ struct racional sorteia_r(int n)
     {
         r.valido = 0;
     }
-    ponteiro = &r;
-    return simplifica_r(r);
+    simplifica_r(&r);
+    return r;
 }
 
-struct racional simplifica_r(struct racional *r)
+int simplifica_r(struct racional *r)
 {
     int maiorDivisor = mdc(r->num, r->den);
     r->num = r->num / maiorDivisor;
     r->den = r->den / maiorDivisor;
-    return r;
+    return 1;
 }
 
 void imprime_r(struct racional r)
@@ -104,21 +102,40 @@ int valido_r(struct racional r)
 
 int soma_r(struct racional r1, struct racional r2, struct racional *r3)
 {
-    return 0;
+    int minMC = mmc(r1.den, r2.den);
+    r3->num = minMC/r1.den*r1.num + minMC/r2.den*r2.num;
+    r3->den = minMC;
+    simplifica_r(r3);
+    return 1;
 }
 int subtrai_r(struct racional r1, struct racional r2, struct racional *r3)
 {
-    return 0;
+    int minMC = mmc(r1.den, r2.den);
+    r3->num = minMC/r1.den*r1.num - minMC/r2.den*r2.num;
+    r3->den = minMC;
+    simplifica_r(r3);
+    return 1;
 }
 
 int multiplica_r(struct racional r1, struct racional r2, struct racional *r3)
 {
-    return 0;
+    r3->num = r1.num * r2.num;
+    r3->den = r1.den * r2.den;
+    simplifica_r(r3);
+    return 1;
 }
 
 int divide_r(struct racional r1, struct racional r2, struct racional *r3)
 {
-    return 0;
+    r3->num = r1.num * r2.den;
+    r3->den = r1.den * r2.num;
+    if (r3->den == 0)
+    {
+        r3->valido = 0;
+        return 0;
+    }
+    simplifica_r(r3);
+    return 1;
 }
 
 int compara_r (struct racional r1, struct racional r2)
@@ -134,7 +151,7 @@ int compara_r (struct racional r1, struct racional r2)
     {
         return 1;
     }
-    return 0;
+    return -1;
 }
 
 int numerador_r (struct racional r)
@@ -146,4 +163,35 @@ int numerador_r (struct racional r)
 int denominador_r (struct racional r)
 {
     return r.den;
+}
+
+void criar_vetor(struct racional vetor[], int tam)
+{
+    for (int i=0; i <= tam-1; i++)
+    {
+        vetor[i] = sorteia_r(123);
+    }
+}
+
+void imprimir_vetor(struct racional vetor[], int tam)
+{
+    for (int i=0; i <= tam-1; i++)
+    {
+        imprime_r(vetor[i]);
+    }
+    printf("\n");
+}
+
+void ordenar_vetor(struct racional vetor[], int tam)
+{
+    struct racional menor = vetor[0];
+    for (int i = 0; i <=tam-2; i++)
+    {
+        if (compara_r(vetor[i], vetor[i+1]) == (1))
+        {
+            menor = vetor[i+1];
+            vetor[i+1] = vetor[i];
+            vetor[i] = menor;
+        }
+    }
 }
