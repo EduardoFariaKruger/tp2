@@ -9,6 +9,7 @@
 
 int n;
 struct racional v[MAX];
+struct racional soma;
 
 
 int main (){
@@ -16,11 +17,14 @@ int main (){
     /* coloque seu codido aqui */
     srand(0);
 
-    n = 10;
+    scanf("%d", &n);
 
     criar_vetor(v, n);
     imprimir_vetor(v, n);
+    elimina_invalido(v, &n);
+    imprimir_vetor(v, n);
     ordenar_vetor(v, n);
     imprimir_vetor(v, n);
+    soma_e_imprime_vetor(v, n, &soma);
     return 0;
 }

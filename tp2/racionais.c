@@ -46,6 +46,7 @@ struct racional cria_r(int numerador, int denominador)
         r.valido = 0;
         return r;
     }
+    r.valido = 1;
     return r;
 }
 
@@ -57,6 +58,10 @@ struct racional sorteia_r(int n)
     if (r.den == 0)
     {
         r.valido = 0;
+    }
+    else
+    {
+        r.valido = 1;
     }
     simplifica_r(&r);
     return r;
@@ -74,7 +79,7 @@ void imprime_r(struct racional r)
 {
     if ((r.num == 0) || (r.den == 1))
     {
-        printf("%d  ", r.num);
+        printf("%d ", r.num);
         return;
     }
     if ((r.den == (-1)) && (r.num > 0))
@@ -88,6 +93,10 @@ void imprime_r(struct racional r)
     if ((r.den < (-1)) && (r.num > 0))
     {
         printf("%d/%d ", r.num*(-1), r.den*(-1));
+    }
+    if (r.den == 0)
+    {
+        printf("INVALIDO ");
     }
     else
     {
@@ -169,7 +178,7 @@ void criar_vetor(struct racional vetor[], int tam)
 {
     for (int i=0; i <= tam-1; i++)
     {
-        vetor[i] = sorteia_r(123);
+        vetor[i] = sorteia_r(10);
     }
 }
 
@@ -184,14 +193,45 @@ void imprimir_vetor(struct racional vetor[], int tam)
 
 void ordenar_vetor(struct racional vetor[], int tam)
 {
-    struct racional menor = vetor[0];
-    for (int i = 0; i <=tam-2; i++)
+    for (int i = 0; i <=tam-1; i++)
     {
-        if (compara_r(vetor[i], vetor[i+1]) == (1))
+        int menor = i;
+        for (int j = i + 1; j <= tam-1; j++)
         {
-            menor = vetor[i+1];
-            vetor[i+1] = vetor[i];
-            vetor[i] = menor;
+            if (compara_r(vetor[j], vetor[menor]) == -1)
+            {
+                menor = j;
+            }
+        }
+        struct racional aux = vetor[i];
+        vetor[i] = vetor[menor];
+        vetor[menor] = aux;
+    }
+}
+
+void elimina_invalido(struct racional vetor[], int *tam)
+{
+    for (int i = 0; i <= *tam -1; i ++)
+    {
+        if (vetor[i].valido == 0)
+        {
+            for (int j = i; j <= *tam -2; j++)
+            {
+                vetor[j] = vetor[j+1];
+            }
+            *tam = *tam - 1;
         }
     }
+}
+
+void soma_e_imprime_vetor(struct racional vetor[], int tam)
+{
+    struct racional soma = cria_r(0, 1);
+    for (int i = 0; i <= tam-1; i++)
+    {
+        soma_r(soma, vetor[i], &soma);
+    }
+    printf("A soma de todos os elementos do vetor eh: ");
+    imprime_r(soma);
+    printf("\n");
 }
