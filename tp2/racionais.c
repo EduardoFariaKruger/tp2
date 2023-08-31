@@ -36,6 +36,7 @@ int mmc (int a, int b){
     return a * (b / mdc(a, b));
 }
 
+/*Gera um racional a partir de um numerador e denominadora dados*/
 struct racional cria_r(int numerador, int denominador)
 {
     struct racional r;
@@ -50,6 +51,8 @@ struct racional cria_r(int numerador, int denominador)
     return r;
 }
 
+
+/*Gera um racional aleatório com os numeradores e denominadores entre o intervalo [0..n]*/
 struct racional sorteia_r(int n)
 {
     struct racional r;
@@ -67,48 +70,55 @@ struct racional sorteia_r(int n)
     return r;
 }
 
+/*Simplifica um numero racional dividindo tanto o numerador quanto o denominador pelo MDC entre eles*/
 int simplifica_r(struct racional *r)
 {
-    int maiorDivisor = mdc(r->num, r->den);
-    r->num = r->num / maiorDivisor;
-    r->den = r->den / maiorDivisor;
-    return 1;
+    if (valido_r(*r))
+    {
+        int maiorDivisor = mdc(r->num, r->den);
+        r->num = r->num / maiorDivisor;
+        r->den = r->den / maiorDivisor;
+        return 1;
+    }
+    else{
+        return 0;
+    }
 }
 
+
+/*Imprime o número racional no formato "numerador/denominador" considerando os casos:
+    * x/x
+    * x/1
+    * x/0 nesse caso imprime INVALIDO
+    * sinal é sempre movido para o numerador 
+*/
 void imprime_r(struct racional r)
 {
-    if ((r.num == 0) || (r.den == 1))
+    if (!valido_r(r))
+    {
+        printf("INVALIDO ");
+        return;
+    }
+    else if ((r.num == 0) || (r.den == 1))
     {
         printf("%d ", r.num);
         return;
     }
-    if ((r.den == (-1)) && (r.num > 0))
+    else if (((r.num < 0) && (r.num < 0)) || ((r.num > 0) && (r.den < 0)))
     {
-        printf("%d ", r.num*(-1));
+        printf("%d/%d ", -r.num, -r.den);
+        return;
     }
-    if ((r.den < (-1)) && (r.num < 0))
-    {
-        printf("%d/%d ", r.num*(-1), r.den*(-1));
-    }
-    if ((r.den < (-1)) && (r.num > 0))
-    {
-        printf("%d/%d ", r.num*(-1), r.den*(-1));
-    }
-    if (r.den == 0)
-    {
-        printf("INVALIDO ");
-    }
-    else
-    {
-        printf("%d/%d ", r.num, r.den);
-    }
+    printf("%d/%d ", r.num, r.den);
 }
 
+/*Retorna 1 se denominador != 0 e 0 se denominador = 0*/
 int valido_r(struct racional r)
 {
     return (r.den != 0);
 }
 
+/*Soma 2 números racionais e salva em um endereço de memória*/
 int soma_r(struct racional r1, struct racional r2, struct racional *r3)
 {
     int minMC = mmc(r1.den, r2.den);
@@ -117,6 +127,8 @@ int soma_r(struct racional r1, struct racional r2, struct racional *r3)
     simplifica_r(r3);
     return 1;
 }
+
+/*subtrai 2 números racionais e salva em um endereço de memória*/
 int subtrai_r(struct racional r1, struct racional r2, struct racional *r3)
 {
     int minMC = mmc(r1.den, r2.den);
@@ -126,6 +138,7 @@ int subtrai_r(struct racional r1, struct racional r2, struct racional *r3)
     return 1;
 }
 
+/*multiplica 2 números racionais e salva em um endereço de memória*/
 int multiplica_r(struct racional r1, struct racional r2, struct racional *r3)
 {
     r3->num = r1.num * r2.num;
@@ -134,6 +147,7 @@ int multiplica_r(struct racional r1, struct racional r2, struct racional *r3)
     return 1;
 }
 
+/*Divide 2 números racionais e salva em um endereço de memória (quem chama a função deve garantir que os operandos são válidos)*/
 int divide_r(struct racional r1, struct racional r2, struct racional *r3)
 {
     r3->num = r1.num * r2.den;
@@ -147,6 +161,7 @@ int divide_r(struct racional r1, struct racional r2, struct racional *r3)
     return 1;
 }
 
+/*Após aplicar um mesmo denominador comum em ambos os racionais, a função compara os numeradores*/
 int compara_r (struct racional r1, struct racional r2)
 {
     int MMC = mmc(r1.den, r2.den);
@@ -163,75 +178,14 @@ int compara_r (struct racional r1, struct racional r2)
     return -1;
 }
 
+/*acessa e retorna o númerador de um número racional*/
 int numerador_r (struct racional r)
 {
     return r.num;
 }
 
-/* Retorna o denominador de um racional */
+/* acessa e retorna o denominador de um racional */
 int denominador_r (struct racional r)
 {
     return r.den;
-}
-
-void criar_vetor(struct racional vetor[], int tam)
-{
-    for (int i=0; i <= tam-1; i++)
-    {
-        vetor[i] = sorteia_r(10);
-    }
-}
-
-void imprimir_vetor(struct racional vetor[], int tam)
-{
-    for (int i=0; i <= tam-1; i++)
-    {
-        imprime_r(vetor[i]);
-    }
-    printf("\n");
-}
-
-void ordenar_vetor(struct racional vetor[], int tam)
-{
-    for (int i = 0; i <=tam-1; i++)
-    {
-        int menor = i;
-        for (int j = i + 1; j <= tam-1; j++)
-        {
-            if (compara_r(vetor[j], vetor[menor]) == -1)
-            {
-                menor = j;
-            }
-        }
-        struct racional aux = vetor[i];
-        vetor[i] = vetor[menor];
-        vetor[menor] = aux;
-    }
-}
-
-void elimina_invalido(struct racional vetor[], int *tam)
-{
-    for (int i = 0; i <= *tam -1; i ++)
-    {
-        if (vetor[i].valido == 0)
-        {
-            for (int j = i; j <= *tam -2; j++)
-            {
-                vetor[j] = vetor[j+1];
-            }
-            *tam = *tam - 1;
-        }
-    }
-}
-
-void soma_e_imprime_vetor(struct racional vetor[], int tam)
-{
-    struct racional soma = cria_r(0, 1);
-    for (int i = 0; i <= tam-1; i++)
-    {
-        soma_r(soma, vetor[i], &soma);
-    }
-    printf("A soma de todos os elementos do vetor eh: ");
-    imprime_r(soma);
-    printf("\n");
 }
