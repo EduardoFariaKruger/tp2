@@ -1,105 +1,80 @@
-/* Arquivo MAIN que usa o TAD racionais */
-
-/* coloque seus includes aqui */
-#include "racionais.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
-#define MAX 100
+#define N 3
 
-
-/*Gera um vetor de tam posições que contenha números do tipo racional*/
-void criar_vetor(struct racional vetor[], int tam)
-{
-    for (int i=0; i <= tam-1; i++)
-    {
-        vetor[i] = sorteia_r(10);
-    }
-}
-
-/*imprime os elementos de um vetor de racionais*/
-void imprimir_vetor(struct racional vetor[], int tam)
-{
-    for (int i=0; i <= tam-1; i++)
-    {
-        imprime_r(vetor[i]);
+// Função para imprimir o tabuleiro
+void imprimirTabuleiro(int tabuleiro[N][N]) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            printf("%2d ", tabuleiro[i][j]);
+        }
+        printf("\n");
     }
     printf("\n");
 }
 
-/*ordena um vetor de racionais do menor para o maior*/
-void ordenar_vetor(struct racional vetor[], int tam)
-{
-    for (int i = 0; i <=tam-1; i++)
-    {
-        int menor = i;
-        for (int j = i + 1; j <= tam-1; j++)
-        {
-            if (compara_r(vetor[j], vetor[menor]) == -1)
-            {
-                menor = j;
-            }
-        }
-        struct racional aux = vetor[i];
-        vetor[i] = vetor[menor];
-        vetor[menor] = aux;
-    }
-}
-
-/*identifica e elimina todos os números racionais inválidos dentro do vetor*/
-void elimina_invalido(struct racional vetor[], int *tam)
-{
-    for (int i = 0; i <= *tam -1; i ++)
-    {
-        if (vetor[i].valido == 0)
-        {
-            for (int j = i; j <= *tam -2; j++)
-            {
-                vetor[j] = vetor[j+1];
-            }
-            *tam = *tam - 1;
+// Função para verificar se é seguro colocar uma dama em tabuleiro[l][c]
+bool eSeguro(int tabuleiro[N][N], int l, int c) {
+    // Verificar a linha na esquerda
+    for (int i = 0; i < c; i++) {
+        if (tabuleiro[l][i] == 1) {
+            return false;
         }
     }
-}
 
-/*realiza a operação de soma de todos os elementos do vetor e imprime esse resultado na tela*/
-void soma_e_imprime_vetor(struct racional vetor[], int tam)
-{
-    struct racional soma = cria_r(0, 1);
-    for (int i = 0; i <= tam-1; i++)
-    {
-        soma_r(soma, vetor[i], &soma);
+    // Verificar a diagonal superior na esquerda
+    for (int i = l, j = c; i >= 0 && j >= 0; i--, j--) {
+        if (tabuleiro[i][j] == 1) {
+            return false;
+        }
     }
-    printf("A soma de todos os elementos do vetor eh: ");
-    imprime_r(soma);
-    printf("\n");
+
+    // Verificar a diagonal inferior na esquerda
+    for (int i = l, j = c; i < N && j >= 0; i++, j--) {
+        if (tabuleiro[i][j] == 1) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
+// Função para resolver o problema das Damas usando backtracking
+bool resolverDamas(int tabuleiro[N][N], int coluna) {
+    if (coluna >= N) {
+        // Todas as damas estão colocadas, a solução é válida
+        imprimirTabuleiro(tabuleiro);
+        return true;
+    }
 
-int main (){
-    
-    int n;
-    struct racional v[MAX];
+    // Tentar colocar uma dama em cada linha na coluna atual
+    for (int i = 0; i < N; i++) {
+        if (eSeguro(tabuleiro, i, coluna)) {
+            // Colocar a dama e recursivamente tentar a próxima coluna
+            tabuleiro[i][coluna] = 1;
 
-    /*geração da semente aleatória*/
-    srand(0);
+            // Se a recursão encontrar uma solução, retornar true
+            if (resolverDamas(tabuleiro, coluna + 1)) {
+                return true;
+            }
 
-    /*leitura do tamanho do vetor*/
-    scanf("%d", &n);
+            // Se a recursão não encontrar uma solução, retroceder e tentar outra linha
+            tabuleiro[i][coluna] = 0;
+        }
+    }
 
-    /*criação do vetor de N posições e impressão deste*/
-    criar_vetor(v, n);
-    imprimir_vetor(v, n);
+    // Se nenhuma linha funcionar nesta coluna, retornar false
+    return false;
+}
 
-    /*eliminação de todos os elementos inválidos (denominador = 0) e a impressão deste vetor "limpo"*/
-    elimina_invalido(v, &n);
-    imprimir_vetor(v, n);
+// Função principal
+int main() {
+    int tabuleiro[N][N] = {0};
 
-    /*Ordenação do vetor do menor para o maior e a impressão desse vetor ordenado*/
-    ordenar_vetor(v, n);
-    imprimir_vetor(v, n);
+    if (!resolverDamas(tabuleiro, 0)) {
+        printf("Não há solução possível.\n");
+    }
 
-    /*Impressão da soma de todos os elementos do vetor*/
-    soma_e_imprime_vetor(v, n);
     return 0;
 }
