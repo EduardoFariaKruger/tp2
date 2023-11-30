@@ -30,7 +30,7 @@ void inicializaTabuleiro(int tabuleiro[N][N]) {
 }
 
 void imprimeTabuleiro(int tabuleiro[N][N]) {
-    sleep(1);
+    usleep(300000);
     printf("\e[1;1H\e[2J");
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
