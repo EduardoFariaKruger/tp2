@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <unistd.h>
+#include <stdio.h>
 
 #define N 8
 
@@ -28,6 +30,8 @@ void inicializaTabuleiro(int tabuleiro[N][N]) {
 }
 
 void imprimeTabuleiro(int tabuleiro[N][N]) {
+    sleep(1);
+    printf("\e[1;1H\e[2J");
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             printf("%c ", tabuleiro[i][j] ? '1' : '0');
