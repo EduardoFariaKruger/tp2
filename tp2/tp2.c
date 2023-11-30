@@ -1,80 +1,92 @@
 #include <stdio.h>
-#include <stdbool.h>
 
-#define N 3
+#define N 8
 
-// Função para imprimir o tabuleiro
-void imprimirTabuleiro(int tabuleiro[N][N]) {
+// Funções protótipo
+void inicializaTabuleiro(int tabuleiro[N][N]);
+void imprimeTabuleiro(int tabuleiro[N][N]);
+int ehSeguro(int tabuleiro[N][N], int linha, int coluna);
+int tenta(int tabuleiro[N][N], int coluna);
+int resolveProblema();
+
+int main() {
+    if (resolveProblema()) {
+        printf("Solucao encontrada:\n");
+    } else {
+        printf("Nao ha solucao.\n");
+    }
+
+    return 0;
+}
+
+void inicializaTabuleiro(int tabuleiro[N][N]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            printf("%2d ", tabuleiro[i][j]);
+            tabuleiro[i][j] = 0;
+        }
+    }
+}
+
+void imprimeTabuleiro(int tabuleiro[N][N]) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            printf("%c ", tabuleiro[i][j] ? 'Q' : '.');
         }
         printf("\n");
     }
     printf("\n");
 }
 
-// Função para verificar se é seguro colocar uma dama em tabuleiro[l][c]
-bool eSeguro(int tabuleiro[N][N], int l, int c) {
-    // Verificar a linha na esquerda
-    for (int i = 0; i < c; i++) {
-        if (tabuleiro[l][i] == 1) {
-            return false;
+int ehSeguro(int tabuleiro[N][N], int linha, int coluna) {
+    // Verifica a linha
+    for (int i = 0; i < coluna; i++) {
+        if (tabuleiro[linha][i]) {
+            return 0;
         }
     }
 
-    // Verificar a diagonal superior na esquerda
-    for (int i = l, j = c; i >= 0 && j >= 0; i--, j--) {
-        if (tabuleiro[i][j] == 1) {
-            return false;
+    // Verifica diagonal superior esquerda
+    for (int i = linha, j = coluna; i >= 0 && j >= 0; i--, j--) {
+        if (tabuleiro[i][j]) {
+            return 0;
         }
     }
 
-    // Verificar a diagonal inferior na esquerda
-    for (int i = l, j = c; i < N && j >= 0; i++, j--) {
-        if (tabuleiro[i][j] == 1) {
-            return false;
+    // Verifica diagonal inferior esquerda
+    for (int i = linha, j = coluna; i < N && j >= 0; i++, j--) {
+        if (tabuleiro[i][j]) {
+            return 0;
         }
     }
 
-    return true;
+    return 1;
 }
 
-// Função para resolver o problema das Damas usando backtracking
-bool resolverDamas(int tabuleiro[N][N], int coluna) {
-    if (coluna >= N) {
-        // Todas as damas estão colocadas, a solução é válida
-        imprimirTabuleiro(tabuleiro);
-        return true;
+int tenta(int tabuleiro[N][N], int coluna) {
+    if (coluna == N) {
+        // Todas as rainhas estão colocadas com segurança
+        imprimeTabuleiro(tabuleiro);
+        return 1;
     }
 
-    // Tentar colocar uma dama em cada linha na coluna atual
+    int res = 0;
     for (int i = 0; i < N; i++) {
-        if (eSeguro(tabuleiro, i, coluna)) {
-            // Colocar a dama e recursivamente tentar a próxima coluna
+        if (ehSeguro(tabuleiro, i, coluna)) {
             tabuleiro[i][coluna] = 1;
 
-            // Se a recursão encontrar uma solução, retornar true
-            if (resolverDamas(tabuleiro, coluna + 1)) {
-                return true;
-            }
+            // Recursivamente tenta colocar as rainhas nas colunas subsequentes
+            res = tenta(tabuleiro, coluna + 1) || res;
 
-            // Se a recursão não encontrar uma solução, retroceder e tentar outra linha
+            // Se a tentativa não levou a uma solução, desfaz a escolha (backtracking)
             tabuleiro[i][coluna] = 0;
         }
     }
 
-    // Se nenhuma linha funcionar nesta coluna, retornar false
-    return false;
+    return res;
 }
 
-// Função principal
-int main() {
-    int tabuleiro[N][N] = {0};
-
-    if (!resolverDamas(tabuleiro, 0)) {
-        printf("Não há solução possível.\n");
-    }
-
-    return 0;
+int resolveProblema() {
+    int tabuleiro[N][N];
+    inicializaTabuleiro(tabuleiro);
+    return tenta(tabuleiro, 0);
 }
