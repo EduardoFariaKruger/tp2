@@ -1,96 +1,40 @@
 #include <stdio.h>
-#include <unistd.h>
-#include <stdio.h>
 
-#define N 8
+void imprime_vetor(int set[], int v[], int n) {
+    printf("{ ");
+    for (int i = 0; i < n; i++) {
+        if (v[i] == 1) {
+            printf("%d ", set[i]);
+        }
+    }
+    printf("}\n");
+}
 
-// Funções protótipo
-void inicializaTabuleiro(int tabuleiro[N][N]);
-void imprimeTabuleiro(int tabuleiro[N][N]);
-int ehSeguro(int tabuleiro[N][N], int linha, int coluna);
-int tenta(int tabuleiro[N][N], int coluna);
-int resolveProblema();
+void bt(int set[], int v[], int n, int i, int B, int currentSum) {
+    if (currentSum >= B) {
+        return;
+    }
+
+    if (i == n) {
+        imprime_vetor(set, v, n);
+        return;
+    }
+
+    v[i] = 0;
+    bt(set, v, n, i + 1, B, currentSum);
+    v[i] = 1;
+    bt(set, v, n, i + 1, B, currentSum + set[i]);
+}
+
+void subconjuntos(int set[], int n, int B) {
+    int v[n];
+    bt(set, v, n, 0, B, 0);
+}
 
 int main() {
-    if (resolveProblema()) {
-        printf("Solucao encontrada:\n");
-    } else {
-        printf("Nao ha solucao.\n");
-    }
-
+    int set[] = {23, 10, 20, 11, 12, 6, 7};
+    int n = 7;
+    int B = 40; // Exemplo de valor para B
+    subconjuntos(set, n, B);
     return 0;
-}
-
-void inicializaTabuleiro(int tabuleiro[N][N]) {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            tabuleiro[i][j] = 0;
-        }
-    }
-}
-
-void imprimeTabuleiro(int tabuleiro[N][N]) {
-    usleep(300000);
-    printf("\e[1;1H\e[2J");
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            printf("%c ", tabuleiro[i][j] ? '1' : '0');
-        }
-        printf("\n");
-    }
-    printf("\n");
-}
-
-int ehSeguro(int tabuleiro[N][N], int linha, int coluna) {
-    // Verifica a linha
-    for (int i = 0; i < coluna; i++) {
-        if (tabuleiro[linha][i]) {
-            return 0;
-        }
-    }
-
-    // Verifica diagonal superior esquerda
-    for (int i = linha, j = coluna; i >= 0 && j >= 0; i--, j--) {
-        if (tabuleiro[i][j]) {
-            return 0;
-        }
-    }
-
-    // Verifica diagonal inferior esquerda
-    for (int i = linha, j = coluna; i < N && j >= 0; i++, j--) {
-        if (tabuleiro[i][j]) {
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-int tenta(int tabuleiro[N][N], int coluna) {
-    if (coluna == N) {
-        // Todas as rainhas estão colocadas com segurança
-        imprimeTabuleiro(tabuleiro);
-        return 1;
-    }
-
-    int res = 0;
-    for (int i = 0; i < N; i++) {
-        if (ehSeguro(tabuleiro, i, coluna)) {
-            tabuleiro[i][coluna] = 1;
-
-            // Recursivamente tenta colocar as rainhas nas colunas subsequentes
-            res = tenta(tabuleiro, coluna + 1) || res;
-
-            // Se a tentativa não levou a uma solução, desfaz a escolha (backtracking)
-            tabuleiro[i][coluna] = 0;
-        }
-    }
-
-    return res;
-}
-
-int resolveProblema() {
-    int tabuleiro[N][N];
-    inicializaTabuleiro(tabuleiro);
-    return tenta(tabuleiro, 0);
 }
