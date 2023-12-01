@@ -28,7 +28,7 @@ void bt(int set[], int v[], int n, int i, int B, int currentSum) {
 
 void subconjuntos(int set[], int n, int B) {
     int v[n];
-    bt(set, v, n, 0, B, 0);
+    bt(set, v, n, 0, 0, 0);
 }
 
 int main() {
